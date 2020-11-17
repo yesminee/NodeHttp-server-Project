@@ -20,19 +20,19 @@ const server = http.createServer((req,res) =>{
         
         var filePath = path.resolve ('./public'+fileUrl);
         const fileExt = path.extname(filePath) // extname = file extention
-        if (fileExt == '.html'){
-            fs.exists(filePath, (exists)=> {
-                if(!exists) {
-                    res.statusCode = 404 ;
+        if (fileExt == '.html'){   //fs.exists deprected
+            fs.stat(filePath, function(err, stats){
+                if (err){
+                    res.statusCode = 404;
                     res.setHeader('Content-Type', 'text/html');
                     res.end('<html><body><h1>ERROR 404: </h1></body></html>' + fileUrl + '<html><body><h1>NOT FOUND</h1></body></html>');
                     return;
-                } //else
-                res.statusCode = 200;
-                res.setHeader('content-type', 'text/html');
-                fs.createReadStream(filePath).pipe(res); //reads file content and put it in res body
-            });
-            
+                }else{
+                    res.statusCode = 200;
+                    res.setHeader('content-type', 'text/html');
+                    fs.createReadStream(filePath).pipe(res); //reads file content and put it in res body
+                }
+            })            
         }
         else {
             res.statusCode = 404;
